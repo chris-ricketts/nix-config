@@ -248,7 +248,7 @@ let-env config = {
     clickable_links: true # enable or disable clickable links. Your terminal has to support links.
   }
   rm: {
-    always_trash: false # always act as if -t was given. Can be overridden with -p
+    always_trash: true # always act as if -t was given. Can be overridden with -p
   }
   cd: {
     abbreviations: true # allows `cd s/o/f` to expand to `cd some/other/folder`
@@ -271,7 +271,7 @@ let-env config = {
     case_sensitive: false # set to true to enable case-sensitive completions
     quick: true  # set this to false to prevent auto-selecting completions when only one remains
     partial: true  # set this to false to prevent partial filling of the prompt
-    algorithm: "prefix"  # prefix or fuzzy
+    algorithm: "fuzzy"  # prefix or fuzzy
     external: {
       enable: true # set to false to prevent nushell looking into $env.PATH to find more suggestions, `false` recommended for WSL users as this look up my be very slow
       max_results: 100 # setting it lower can improve completion performance at the cost of omitting some options
@@ -288,9 +288,9 @@ let-env config = {
   float_precision: 2
   # buffer_editor: "emacs" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
-  edit_mode: emacs # emacs, vi
+  edit_mode: vi # emacs, vi
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
-  show_banner: true # true or false to enable or disable the banner
+  show_banner: false # true or false to enable or disable the banner
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
   hooks: {
     pre_prompt: [{
@@ -530,29 +530,4 @@ let-env config = {
       event: { send: menu name: commands_with_description }
     }
   ]
-}
-
-export-env {
-    let-env POWERLINE_COMMAND = 'oh-my-posh'
-    let-env POSH_THEME = ''
-    let-env PROMPT_INDICATOR = ""
-    let-env POSH_PID = (random uuid)
-    # By default displays the right prompt on the first line
-    # making it annoying when you have a multiline prompt
-    # making the behavior different compared to other shells
-    let-env PROMPT_COMMAND_RIGHT = {''}
-    let-env NU_VERSION = (version | get version)
-
-    # PROMPTS
-    let-env PROMPT_MULTILINE_INDICATOR = (^"/nix/store/hcxsbcyr84wicdhq1hiwr7nx0jbdz88a-oh-my-posh-12.26.2/bin/oh-my-posh" print secondary $"--config=($env.POSH_THEME)" --shell=nu $"--shell-version=($env.NU_VERSION)")
-
-    let-env PROMPT_COMMAND = {
-        # We have to do this because the initial value of `$env.CMD_DURATION_MS` is always `0823`,
-        # which is an official setting.
-        # See https://github.com/nushell/nushell/discussions/6402#discussioncomment-3466687.
-        let cmd_duration = if $env.CMD_DURATION_MS == "0823" { 0 } else { $env.CMD_DURATION_MS }
-
-        let width = ((term size).columns | into string)
-        ^"/nix/store/hcxsbcyr84wicdhq1hiwr7nx0jbdz88a-oh-my-posh-12.26.2/bin/oh-my-posh" print primary $"--config=($env.POSH_THEME)" --shell=nu $"--shell-version=($env.NU_VERSION)" $"--execution-time=($cmd_duration)" $"--error=($env.LAST_EXIT_CODE)" $"--terminal-width=($width)"
-    }
 }

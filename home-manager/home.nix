@@ -1,10 +1,5 @@
 { inputs, lib, config, pkgs, ... }: {
-  imports = [
-  ];
-
   nixpkgs = {
-    overlays = [
-    ];
     config = {
       allowUnfree = true;
       # Workaround for https://github.com/nix-community/home-manager/issues/2942
@@ -20,17 +15,24 @@
   home.packages = [
     pkgs.bemenu
     (pkgs.nerdfonts.override { fonts = [ "Hack" ]; })
+    pkgs.joshuto
   ];
 
   fonts.fontconfig.enable = true;
     
   programs.home-manager.enable = true;
-  programs.git.enable = true;
-  programs.firefox.enable = true;
+  programs.librewolf.enable = true;
   programs.zsh.enable = true;
-  programs.oh-my-posh.enable = true;
-  
+  programs.starship.enable = true;
+  programs.zellij.enable = true;
+  programs.lazygit.enable = true;
 
+  programs.git = {
+    enable = true;
+    userName = "Chris Ricketts";
+    userEmail = "chris-ricketts@proton.me";
+  };
+  
   programs.nushell = {
     enable = true;
     configFile.source = ./nushell/config.nu;
@@ -120,6 +122,7 @@
         "${modifier}+tab" = "workspace back_and_forth";
         "${modifier}+Return" = "exec ${terminal}";
         "${modifier}+Shift+Return" = "exec ${terminal} -o shell.program=zsh";
+        "${modifier}+z" = "exec ${terminal} -o shell.program=zellij";
          "${modifier}+Shift+q" = "kill";
          "${modifier}+d" = "exec ${menu}";
 
