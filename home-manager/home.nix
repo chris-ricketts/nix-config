@@ -17,21 +17,193 @@
     homeDirectory = "/home/chris";
   };
 
+  home.packages = [
+    pkgs.bemenu
+    (pkgs.nerdfonts.override { fonts = [ "Hack" ]; })
+  ];
+
+  fonts.fontconfig.enable = true;
+    
   programs.home-manager.enable = true;
   programs.git.enable = true;
-  programs.alacritty.enable = true;
-  programs.helix.enable = true;
   programs.firefox.enable = true;
+  programs.zsh.enable = true;
+  programs.oh-my-posh.enable = true;
+  
+
+  programs.nushell = {
+    enable = true;
+    configFile.source = ./nushell/config.nu;
+    envFile.source = ./nushell/env.nu;
+  };
+  
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      shell.program = "nu";
+      window.padding.x = 5;
+      font = {
+        normal.family = "Hack Nerd Font Mono";
+        normal.style = "Regular";
+        bold.family = "Hack Nerd Font Mono";
+        bold.style = "Bold";
+        italic.family = "Hack Nerd Font Mono";
+        italic.style = "Italic";
+        bold_italic.family = "Hack Nerd Font Mono";
+        bold_italic.style = "Bold Italic";
+      };
+    };
+  };
+
+  programs.helix = {
+    enable = true;
+    settings = {
+      theme = "catppuccin_macchiato";
+      editor = {
+        auto-save = true;
+        idle-timeout = 0;
+        bufferline = "multiple";
+        line-number = "relative";
+        cursorline = true;
+        cursor-shape = {
+          insert = "bar";
+          normal = "block";
+          select = "underline";
+        };
+        indent-guides.render = true;
+      };
+      keys = {
+        normal = {
+          C-s = ":w";
+          A-space = "code_action";
+          D = "kill_to_line_end";
+          L = ":buffer-next";
+          H = ":buffer-previous";
+          C-x = "extend_line_up";
+          "]" = {
+            a = "code_action";
+            A = [ "goto_next_diag" "code_action" ];
+          };
+          "[" = {
+            a = "code_action";
+            A = [ "goto_prev_diag" "code_action" ];
+          };
+          space = {
+            space = "goto_last_accessed_file";
+            c = ":buffer-close";
+            C = ":buffer-close-others";
+            q = ":quit";
+          };
+        };
+        insert = {
+          C-s = [ "normal_mode" ":write" ];
+          A-space = "code_action";
+        };
+      };
+    };
+  };
   
   wayland.windowManager.sway = {
     enable = true;
     config = rec {
       modifier = "Mod4";
-      terminal = "alacritty"; 
-      startup = [
-        # Launch Firefox on start
-        {command = "firefox";}
-      ];
+      terminal = "alacritty";
+      menu = "bemenu-run -l 5 -p '>'";
+      left = "h";
+      down = "j";
+      up = "k";
+      right = "l";
+      window = {
+        hideEdgeBorders = "smart";
+      };
+      keybindings = {
+        "${modifier}+tab" = "workspace back_and_forth";
+        "${modifier}+Return" = "exec ${terminal}";
+        "${modifier}+Shift+Return" = "exec ${terminal} -o shell.program=zsh";
+         "${modifier}+Shift+q" = "kill";
+         "${modifier}+d" = "exec ${menu}";
+
+         "${modifier}+${left}" = "focus left";
+         "${modifier}+${down}" = "focus down";
+         "${modifier}+${up}" = "focus up";
+         "${modifier}+${right}" = "focus right";
+
+         "${modifier}+Left" = "focus left";
+         "${modifier}+Down" = "focus down";
+         "${modifier}+Up" = "focus up";
+         "${modifier}+Right" = "focus right";
+
+         "${modifier}+Shift+${left}" = "move left";
+         "${modifier}+Shift+${down}" = "move down";
+         "${modifier}+Shift+${up}" = "move up";
+         "${modifier}+Shift+${right}" = "move right";
+
+         "${modifier}+Shift+Left" = "move left";
+         "${modifier}+Shift+Down" = "move down";
+         "${modifier}+Shift+Up" = "move up";
+         "${modifier}+Shift+Right" = "move right";
+
+         "${modifier}+b" = "splith";
+         "${modifier}+v" = "splitv";
+         "${modifier}+f" = "fullscreen toggle";
+         "${modifier}+a" = "focus parent";
+
+         "${modifier}+s" = "layout stacking";
+         "${modifier}+w" = "layout tabbed";
+         "${modifier}+e" = "layout toggle split";
+
+         "${modifier}+Shift+space" = "floating toggle";
+         "${modifier}+space" = "focus mode_toggle";
+
+         "${modifier}+1" = "workspace number 1";
+         "${modifier}+2" = "workspace number 2";
+         "${modifier}+3" = "workspace number 3";
+         "${modifier}+4" = "workspace number 4";
+         "${modifier}+5" = "workspace number 5";
+         "${modifier}+6" = "workspace number 6";
+         "${modifier}+7" = "workspace number 7";
+         "${modifier}+8" = "workspace number 8";
+         "${modifier}+9" = "workspace number 9";
+
+         "${modifier}+Shift+1" =
+           "move container to workspace number 1";
+         "${modifier}+Shift+2" =
+           "move container to workspace number 2";
+         "${modifier}+Shift+3" =
+           "move container to workspace number 3";
+         "${modifier}+Shift+4" =
+           "move container to workspace number 4";
+         "${modifier}+Shift+5" =
+           "move container to workspace number 5";
+         "${modifier}+Shift+6" =
+           "move container to workspace number 6";
+         "${modifier}+Shift+7" =
+           "move container to workspace number 7";
+         "${modifier}+Shift+8" =
+           "move container to workspace number 8";
+         "${modifier}+Shift+9" =
+           "move container to workspace number 9";
+
+         "${modifier}+Shift+minus" = "move scratchpad";
+         "${modifier}+minus" = "scratchpad show";
+
+         "${modifier}+Shift+c" = "reload";
+         "${modifier}+Shift+e" =
+           "exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'";
+
+         "${modifier}+r" = "mode resize";
+      };
+      input = {
+        "type:keyboard" = {
+          xkb_layout = "gb";
+          xkb_options = "ctrl:nocaps";
+        };
+      };
+      output = {
+        "*" = {
+          bg = "#000000 solid_color";
+        };
+      };
     };
   };
 
