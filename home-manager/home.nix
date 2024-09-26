@@ -1,4 +1,7 @@
-{ inputs, lib, config, pkgs, ... }: {
+{  pkgs, ... }: let 
+  fontName = "FiraMono Nerd Font Mono";
+in 
+{
   nixpkgs = {
     config = {
       allowUnfree = true;
@@ -14,7 +17,7 @@
 
   home.packages = [
     pkgs.bemenu
-    (pkgs.nerdfonts.override { fonts = [ "Hack" ]; })
+    (pkgs.nerdfonts.override { fonts = [ "FiraMono" ]; })
     pkgs.joshuto
     pkgs.pavucontrol
     pkgs.tdesktop
@@ -26,28 +29,42 @@
     pkgs.calibre
     pkgs.hexchat
     pkgs.sway-contrib.grimshot
-    pkgs.projectable
+    pkgs.cachix
+    pkgs.tealdeer
+    pkgs.pass
+    pkgs.unzip
+    pkgs.ledger-live-desktop
   ];
 
   fonts.fontconfig.enable = true;
 
   programs.home-manager.enable = true;
+  programs.gpg.enable = true;
+  programs.direnv.enable = true;
   programs.librewolf.enable = true;
   programs.zsh.enable = true;
-  programs.starship.enable = true;
   programs.zellij.enable = true;
   programs.lazygit.enable = true;
+  programs.swaylock.enable = true;
+
+  programs.starship = {
+    enable = true;
+    settings = {
+      gcloud.disabled = true;
+    };
+  };
 
   programs.git = {
     enable = true;
     userName = "Chris Ricketts";
-    userEmail = "chris-ricketts@proton.me";
+    userEmail = "chris_ricketts@protonmail.com";
   };
   
   programs.nushell = {
     enable = true;
     configFile.source = ./nushell/config.nu;
     envFile.source = ./nushell/env.nu;
+    package = pkgs.nushellFull;
   };
   
   programs.alacritty = {
@@ -55,28 +72,37 @@
     settings = {
       shell.program = "nu";
       font = {
-        normal.family = "Hack Nerd Font Mono";
+        normal.family = fontName;
         normal.style = "Regular";
-        bold.family = "Hack Nerd Font Mono";
+        bold.family = fontName;
         bold.style = "Bold";
-        italic.family = "Hack Nerd Font Mono";
-        italic.style = "Italic";
-        bold_italic.family = "Hack Nerd Font Mono";
-        bold_italic.style = "Bold Italic";
       };
     };
   };
 
   programs.helix = {
     enable = true;
-    languages = [{
-      name = "rust";
-      config = {
-        checkOnSave = {
-          command = "clippy";
+    languages = {
+      language-server = {
+        rust-analyzer = {
+          config = {
+            checkOnSave = {
+              command = "clippy";
+            };
+          };
         };
       };
-    }];
+
+      language = [{
+        name = "typescript";
+        formatter = {
+          command = "prettier";
+          args = [ "--parser" "typescript" ];
+        };
+        auto-format = true;
+      }];      
+    };
+
     settings = {
       theme = "catppuccin_macchiato";
       editor = {
@@ -141,6 +167,7 @@
       window = {
         hideEdgeBorders = "smart";
       };
+      fonts.names = [ fontName ];
       keybindings = {
         "${modifier}+tab" = "workspace back_and_forth";
         "${modifier}+Return" = "exec ${terminal}";
@@ -149,6 +176,7 @@
         "${modifier}+Shift+z" = "exec ${terminal} -o shell.program=zellij --layout default";
          "${modifier}+Shift+q" = "kill";
          "${modifier}+d" = "exec ${menu}";
+         "${modifier}+Shift+0" = "exec swaylock --color 000000";
 
          "${modifier}+${left}" = "focus left";
          "${modifier}+${down}" = "focus down";
@@ -233,12 +261,61 @@
           bg = "#000000 solid_color";
         };
       };
+      bars = [{
+        mode = "dock";
+        hiddenState = "hide";
+        position = "bottom";
+        workspaceButtons = true;
+        workspaceNumbers = true;
+        statusCommand = "${pkgs.i3status}/bin/i3status";
+        fonts = {
+          names = [ "Lilex Nerd Font Mono" ];
+          size = 8.0;
+        };
+        trayOutput = "primary";
+        colors = {
+          background = "#000000";
+          statusline = "#ffffff";
+          separator = "#666666";
+          focusedWorkspace = {
+            border = "#4c7899";
+            background = "#285577";
+            text = "#ffffff";
+          };
+          activeWorkspace = {
+            border = "#333333";
+            background = "#5f676a";
+            text = "#ffffff";
+          };
+          inactiveWorkspace = {
+            border = "#333333";
+            background = "#222222";
+            text = "#888888";
+          };
+          urgentWorkspace = {
+            border = "#2f343a";
+            background = "#900000";
+            text = "#ffffff";
+          };
+          bindingMode = {
+            border = "#2f343a";
+            background = "#900000";
+            text = "#ffffff";
+          };
+        };
+      }];
     };
   };
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
 
+  services.gnome-keyring.enable = true;
+  services.gpg-agent = {
+    enable = true;
+    pinentryFlavor = "gnome3";
+  };
+  
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   home.stateVersion = "22.11";
 }

@@ -242,16 +242,13 @@ let light_theme = {
 
 
 # The default config record. This is where much of your global configuration is setup.
-let-env config = {
+$env.config = {
   ls: {
     use_ls_colors: true # use the LS_COLORS environment variable to colorize output
     clickable_links: true # enable or disable clickable links. Your terminal has to support links.
   }
   rm: {
     always_trash: true # always act as if -t was given. Can be overridden with -p
-  }
-  cd: {
-    abbreviations: true # allows `cd s/o/f` to expand to `cd some/other/folder`
   }
   table: {
     mode: rounded # basic, compact, compact_double, light, thin, with_love, rounded, reinforced, heavy, none, other
@@ -292,22 +289,6 @@ let-env config = {
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
   show_banner: false # true or false to enable or disable the banner
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
-  hooks: {
-    pre_prompt: [{
-      $nothing  # replace with source code to run before the prompt is shown
-    }]
-    pre_execution: [{
-      $nothing  # replace with source code to run before the repl input is run
-    }]
-    env_change: {
-      PWD: [{|before, after|
-        $nothing  # replace with source code to run if the PWD environment is different since the last repl input
-      }]
-    }
-    display_output: {
-      if (term size).columns >= 100 { table -e } else { table }
-    }
-  }
   menus: [
       # Configuration for default nushell menus
       # Note the lack of souce parameter

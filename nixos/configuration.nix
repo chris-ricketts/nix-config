@@ -17,6 +17,7 @@
     settings = {
       experimental-features = "nix-command flakes";
       auto-optimise-store = true;
+      trusted-users = [ "root" "chris" ];
     };
 
     extraOptions = ''
@@ -51,6 +52,10 @@
     pulse.enable = true;
   };
 
+  services.udev.packages = [
+    pkgs.ledger-udev-rules
+  ];
+
   hardware.bluetooth.enable = true;
 
   hardware.pulseaudio.enable = false;
@@ -66,6 +71,8 @@
   };
 
   security.polkit.enable = true;
+
+  security.pam.services.swaylock = {};
   
   environment.systemPackages = with pkgs; [
     vim
