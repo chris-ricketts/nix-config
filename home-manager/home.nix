@@ -64,7 +64,6 @@ in
     enable = true;
     configFile.source = ./nushell/config.nu;
     envFile.source = ./nushell/env.nu;
-    package = pkgs.nushellFull;
   };
   
   programs.alacritty = {
@@ -313,7 +312,7 @@ in
   services.gnome-keyring.enable = true;
   services.gpg-agent = {
     enable = true;
-    pinentryFlavor = "gnome3";
+    pinentryPackage = pkgs.pinentry-curses;
   };
   
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

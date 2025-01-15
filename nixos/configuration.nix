@@ -39,10 +39,7 @@
 
   programs.light.enable = true;
 
-  hardware.opengl = {
-    enable = true;
-    driSupport = true;
-  };
+  hardware.graphics.enable = true;
   
   security.rtkit.enable = true;
   services.pipewire = {
@@ -59,8 +56,6 @@
   hardware.bluetooth.enable = true;
 
   hardware.pulseaudio.enable = false;
-
-  sound.enable = false;
 
   users.users = {
     chris = {
